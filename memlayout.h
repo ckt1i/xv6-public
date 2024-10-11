@@ -8,6 +8,9 @@
 #define KERNBASE 0x80000000         // First kernel virtual address
 #define KERNLINK (KERNBASE+EXTMEM)  // Address where kernel is linked
 
+// Define the top of the user address space. This is the highest user address
+#define USERTOP 0x80000000  // 用户地址空间的顶部
+
 #define V2P(a) (((uint) (a)) - KERNBASE)
 #define P2V(a) ((void *)(((char *) (a)) + KERNBASE))
 

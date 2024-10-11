@@ -77,6 +77,31 @@ trap(struct trapframe *tf)
             cpuid(), tf->cs, tf->eip);
     lapiceoi();
     break;
+    
+  // 新增触发页错误（Page Fault）的情况
+  case T_PGFLT:
+  // 条件检查：确保页面错误地址在用户栈范围内。
+  if (rcr2() < USERTOP && rcr2() >= myproc()->stackbase - PGSIZE) {
+
+    //打印调试信息：页面错误地址和当前栈位置
+    cprintf("page fault at %x\n", rcr2());
+    cprintf("current stack position: %x\n", myproc()->stackbase);
+
+    // 分配新的用户栈页面
+    // 尝试分配新的栈页
+    if (allocuvm(myproc()->pgdir, myproc()->stackbase - PGSIZE, myproc()->stackbase) == 0) {
+      myproc()->killed = 1; // 如果分配失败，标记进程为被杀死。
+    } 
+    else{
+      // 更新栈基地址并打印。
+      myproc()->stackbase -= PGSIZE; 
+      cprintf("allocated new stack page at %x\n", myproc()->stackbase);
+    }
+    return;
+    } else {
+      myproc()->killed = 1;
+      break;
+    }
 
   //PAGEBREAK: 13
   default:

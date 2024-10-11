@@ -12,7 +12,7 @@ exec(char *path, char **argv)
 {
   char *s, *last;
   int i, off;
-  uint argc, sz, sp, ustack[3+MAXARG+1];
+  uint argc, sz, stackbase, sp, ustack[3+MAXARG+1];
   struct elfhdr elf;
   struct inode *ip;
   struct proghdr ph;
@@ -60,19 +60,18 @@ exec(char *path, char **argv)
   end_op();
   ip = 0;
 
-  // Allocate two pages at the next page boundary.
-  // Make the first inaccessible.  Use the second as the user stack.
-  sz = PGROUNDUP(sz);
-  if((sz = allocuvm(pgdir, sz, sz + 2*PGSIZE)) == 0)
+// Allocate user stack at the top of the address space.
+  stackbase = USERTOP - 2*PGSIZE;
+  if((allocuvm(pgdir, stackbase, USERTOP)) == 0)
     goto bad;
-  clearpteu(pgdir, (char*)(sz - 2*PGSIZE));
-  sp = sz;
+  clearpteu(pgdir, (char*)(stackbase));
+  sp = USERTOP;
 
   // Push argument strings, prepare rest of stack in ustack.
   for(argc = 0; argv[argc]; argc++) {
     if(argc >= MAXARG)
       goto bad;
-    sp = (sp - (strlen(argv[argc]) + 1)) & ~3;
+    sp = (sp - (strlen(argv[argc]) + 1)) & ~3; // 4字节对齐
     if(copyout(pgdir, sp, argv[argc], strlen(argv[argc]) + 1) < 0)
       goto bad;
     ustack[3+argc] = sp;
@@ -99,6 +98,10 @@ exec(char *path, char **argv)
   curproc->sz = sz;
   curproc->tf->eip = elf.entry;  // main
   curproc->tf->esp = sp;
+
+  // Set the stack base for the process.
+  curproc->stackbase = stackbase;
+  
   switchuvm(curproc);
   freevm(oldpgdir);
   return 0;
