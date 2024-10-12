@@ -337,10 +337,9 @@ copyuvm(pde_t *pgdir, uint sz, uint stackbase)
       goto bad;
     }
   }
-  return d;
 
   // Copy the stack
-  for(i = stackbase; i < USERTOP; i += PGSIZE){
+  for(i = stackbase; i < KERNBASE - PGSIZE; i += PGSIZE){
     if((pte = walkpgdir(pgdir, (void *) i, 0)) == 0)
       panic("copyuvm: pte should exist");
     if(!(*pte & PTE_P))

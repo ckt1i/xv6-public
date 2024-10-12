@@ -61,11 +61,12 @@ exec(char *path, char **argv)
   ip = 0;
 
 // Allocate user stack at the top of the address space.
-  stackbase = USERTOP - 2*PGSIZE;
-  if((allocuvm(pgdir, stackbase, USERTOP)) == 0)
+  sz = PGROUNDUP(sz);
+  if((stackbase = allocuvm(pgdir, KERNBASE - 2 * PGSIZE, KERNBASE - PGSIZE)) == 0)
     goto bad;
-  clearpteu(pgdir, (char*)(stackbase));
-  sp = USERTOP;
+//  clearpteu(pgdir, (char*)(stackbase));
+  sp = stackbase;
+  stackbase -= PGSIZE;
 
   // Push argument strings, prepare rest of stack in ustack.
   for(argc = 0; argv[argc]; argc++) {

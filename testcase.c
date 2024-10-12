@@ -1,6 +1,7 @@
 #include "types.h"
 #include "stat.h"
 #include "user.h"
+#include "memlayout.h"
 
 // 获取当前栈指针
 uint get_stack_pointer() {
@@ -50,7 +51,7 @@ void recursive_call(int depth) {
     printf(1, "Recursion depth: %d, buffer address: 0x%x\n", depth, buffer);
 
     // 递归调用，强制栈增长
-    if (depth < 100) {
+    if (depth < 200) {
         recursive_call(depth + 1);
     }
 }
