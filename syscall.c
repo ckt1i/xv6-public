@@ -17,7 +17,7 @@
 int
 fetchint(uint addr, int *ip)
 {
-  struct proc *curproc = myproc();
+//  struct proc *curproc = myproc();
 
 /*  if(addr >= curproc->sz || addr+4 > curproc->sz)
     return -1; */
@@ -59,7 +59,7 @@ int
 argptr(int n, char **pp, int size)
 {
   int i;
-  struct proc *curproc = myproc();
+//  struct proc *curproc = myproc();
  
   if(argint(n, &i) < 0)
     return -1;

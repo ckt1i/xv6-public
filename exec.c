@@ -61,8 +61,8 @@ exec(char *path, char **argv)
   ip = 0;
 
 // Allocate user stack at the top of the address space.
-  sz = PGROUNDUP(sz);
-  if((stackbase = allocuvm(pgdir, KERNBASE - 2 * PGSIZE, KERNBASE - PGSIZE)) == 0)
+  sz = PGROUNDUP(sz); //页对齐
+  if((stackbase = allocuvm(pgdir, KERNBASE - 2 * PGSIZE, KERNBASE - PGSIZE)) == 0) //为用户栈分配空间，从KERNBASE-2*PGSIZE到KERNBASE-PGSIZE
     goto bad;
 //  clearpteu(pgdir, (char*)(stackbase));
   sp = stackbase;
