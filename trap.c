@@ -94,6 +94,12 @@ trap(struct trapframe *tf)
     myproc()->stackbase-=PGSIZE; // 更新用户栈的栈顶位置
     cprintf("create a new page %x\n", myproc()->stackbase);
       //clearpteu(myproc()->pgdir, (char *) (myproc()->stackbase - PGSIZE));
+    if (myproc()->stackbase > KERNBASE - 1)
+    {
+      myproc()->killed = 1;
+      cprintf("There is no space for the stack\n");
+      exit();
+    }
     return;
   }
   else
