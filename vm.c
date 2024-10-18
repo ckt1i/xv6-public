@@ -236,6 +236,7 @@ allocuvm(pde_t *pgdir, uint oldsz, uint newsz)
     mem = kalloc(); // 为每页分配物理内存
     if(mem == 0){
       cprintf("allocuvm out of memory\n");
+      cprintf("The stack have grown into the heap\n");
       deallocuvm(pgdir, newsz, oldsz);
       return 0;
     }
